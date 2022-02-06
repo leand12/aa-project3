@@ -33,7 +33,6 @@ class BloomFilter:
         self.hash_fun = hash_fun
 
         self.vector = BitArray(self.m)
-        self.data = {}  # data structure to store the data - not usual
         self.false_positive = 0     # for testing
 
     @classmethod
@@ -59,38 +58,8 @@ class BloomFilter:
         k = (m/n) * math.log(2)
         return int(k)
 
-    def add(self, item):
-        """ Add an item in the filter """
-        digests = []
-        for i in range(self.hash_count):
-
-            # create digest for given item.
-            # i work as seed to mmh3.hash() function
-            # With different seed, digest created is different
-            digest = mmh3.hash(item, i) % self.size
-            digests.append(digest)
-
-            # set the bit True in bit_array
-            self.bit_array.set_bit(digest, 1)
-
-    def check(self, item):
-        """
-        Check for existence of an item in filter
-        """
-        for i in range(self.hash_count):
-            digest = mmh3.hash(item, i) % self.size
-            if not self.bit_array.get_bit(digest):
-
-                # if any of bit is False then,its not present
-                # in filter
-                # else there is probability that it exist
-                return False
-        return True
-
-    def insert(self, key, value):
-        """ Insert the pair (key, value) """
-
-        self.data[key] = value
+    def insert(self, key):
+        """ Insert a key """
 
         for i in range(self.k):
             bit = self.hash_fun(key + str(i)) % self.m
@@ -105,12 +74,3 @@ class BloomFilter:
                 return False    # the key doesn't exist
 
         return True             # the key can be in the data set
-
-    def get(self, key):
-        """ Return the value associated with key """
-
-        if self.contains(key):
-            try:
-                return self.data[key]   # actual lookup
-            except KeyError:
-                self.false_positive += 1

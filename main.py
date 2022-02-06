@@ -7,15 +7,18 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description='Distinct Word Counting Program')
 
-    parser.add_argument('file', type=argparse.FileType('r'),
+    parser.add_argument('text-file', type=argparse.FileType('r'),
                         help='the path of the file with the words to be counted')
+    parser.add_argument('stopwords-file', type=argparse.FileType('r'),
+                        help='the path of the file with the words that should be ignored')
     parser.add_argument('counter', choices=['exact', 'bloom'],
                         help='the type of counter')
 
-    args = parser.parse_args()
+    args = vars(parser.parse_args())
 
-    exact = ExactCounter(args.file.name)
-    bloom = BloomFilterCounter(args.file.name)
+    if args['counter'] == 'exact':
+        counter = ExactCounter(args['text-file'].name, args['stopwords-file'].name)
+    else:
+        counter = BloomFilterCounter(args['text-file'].name, args['stopwords-file'].name)
 
-    for word in exact.read_chars():
-        print(word)
+    print(counter.count())
