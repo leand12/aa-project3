@@ -17,4 +17,5 @@ if __name__ == '__main__':
     exact = ExactCounter(args.file.name)
     bloom = BloomFilterCounter(args.file.name)
 
-    exact.read_chars()
+    for word in exact.read_chars():
+        print(word)

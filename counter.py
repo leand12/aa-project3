@@ -1,5 +1,6 @@
 import random
 import math
+import re
 from abc import ABC, abstractmethod
 from bloom_filter import BloomFilter
 
@@ -10,13 +11,12 @@ class Counter(ABC):
         self.filename = filename
 
     def read_chars(self):
-        with open(self.filename) as fp:
+        with open(self.filename, 'r') as fp:
             for line in fp:
                 # normalize words
-                for word in line:
-                    for n_word in re.sub(r'[^a-zA-Z0-9\'-]', ' ', term).split():
-                        print(n_word)
-                        yield n_word
+                for word in line.split():
+                    for n_word in re.sub(r'[^a-zA-Z\'-]', ' ', word).split():
+                        yield n_word.lower()
                 
     @abstractmethod
     def count(self):

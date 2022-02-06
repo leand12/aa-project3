@@ -1,5 +1,5 @@
 import math
-from collections.abc import Callable
+from typing import Callable
 
 
 class BitArray:
@@ -27,7 +27,7 @@ class BloomFilter:
     @param hash_fun: hash function to use
     """
 
-    def __init__(self, m: int, k: int, hash_fun: Callable[str, int]):
+    def __init__(self, m: int, k: int, hash_fun: Callable[[str], int]):
         self.m = m
         self.k = k
         self.hash_fun = hash_fun
