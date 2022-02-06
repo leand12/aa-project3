@@ -44,9 +44,9 @@ class ExactCounter(Counter):
 class BloomFilterCounter(Counter):
     """Distinct word counter with bloom filter."""
 
-    def __init__(self, text_filename: str, stopwords_filename: str):
+    def __init__(self, text_filename: str, stopwords_filename: str, m: int, k: int):
         super().__init__(text_filename, stopwords_filename)
-        self.filter = BloomFilter(500000, 5, hash)
+        self.filter = BloomFilter(m, k, hash)
 
     def count(self):
 

@@ -33,7 +33,6 @@ class BloomFilter:
         self.hash_fun = hash_fun
 
         self.vector = BitArray(self.m)
-        self.false_positive = 0     # for testing
 
     @classmethod
     def get_bitarray_size(self, n: int, p: float):
@@ -48,11 +47,11 @@ class BloomFilter:
         return int(m)
 
     @classmethod
-    def get_hash_count(self, s: int, n):
+    def get_hash_count(self, m: int, n):
         """
         Return the ideal number of hash function to be used
 
-        @param s: size of bit array
+        @param m: size of bit array
         @param n: number of items expected to be stored
         """
         k = (m/n) * math.log(2)
