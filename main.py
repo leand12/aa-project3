@@ -1,6 +1,14 @@
 import argparse
 from bloom_filter import BloomFilter
 from counter import ExactCounter, BloomFilterCounter
+from test import test_optimal_values, test_cbf_hashes, test_cbf_sizes
+
+
+def check_probability(value):
+    ivalue = float(value)
+    if not 0 < ivalue <= 1:
+        raise argparse.ArgumentTypeError("%s is an invalid probability" % value)
+    return ivalue
 
 
 if __name__ == '__main__':
@@ -25,7 +33,7 @@ if __name__ == '__main__':
                               help='test results comparing with exact counter')
 
     bloom_subparser = bloom_parser.add_subparsers(
-        title='bloom type', dest='bloom-type', required=True, help='type of the counter')
+        title='bloom type', dest='bloom-type', required=False, help='type of the counter')
 
     bloom_parser_custom = bloom_subparser.add_parser('custom',
                                                      help='bloom parser with custom configurations')
@@ -38,27 +46,32 @@ if __name__ == '__main__':
                                                       help='bloom parser with optimal configurations')
     bloom_parser_optimal.add_argument('-n', '--expected', metavar='NUM', default=1000, type=int,
                                       help='expected number of keys to be stored (default: %(default)s)')
-    bloom_parser_optimal.add_argument('-p', '--false-positive', metavar='PROB', default=0.1, type=float,
+    bloom_parser_optimal.add_argument('-p', '--false-positive', metavar='PROB', default=0.1, type=check_probability,
                                       help='probability of having a false positive (default: %(default)s)')
 
     args = parser.parse_args()
     vargs = vars(args)
 
-    # m = BloomFilter.get_bitarray_size(n, p)
-    # k = BloomFilter.get_hash_count(m, n)
-
     if vargs['counter-type'] == 'exact':
+        print(f"Running Exact Counter...")
         counter = ExactCounter(
             vargs['text-file'].name, vargs['stopwords-file'].name)
     else:
-        if vargs['bloom-type'] == 'custom':
-            m = args.size
-            k = args.hashes
+        if args.test:
+            test_optimal_values()
+            test_cbf_sizes()
+            test_cbf_hashes()
+            exit(0)
         else:
-            m = BloomFilter.get_bitarray_size(args.expected, args.false_positive)
-            k = BloomFilter.get_hash_count(m, args.expected)
+            if vargs['bloom-type'] == 'custom':
+                m = args.size
+                k = args.hashes
+            else:
+                m = BloomFilter.get_bitarray_size(args.expected, args.false_positive)
+                k = BloomFilter.get_hash_count(m, args.expected)
 
-        counter = BloomFilterCounter(
-            vargs['text-file'].name, vargs['stopwords-file'].name, m, k)
+            print(f"Running Bloom Filter Counter with m={m} and k={k}...")
+            counter = BloomFilterCounter(
+                vargs['text-file'].name, vargs['stopwords-file'].name, m, k)
 
-    print(counter.count())
+    print("%d distinct words counted" % counter.count())

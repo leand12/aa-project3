@@ -44,7 +44,7 @@ class BloomFilter:
         @param p: false positive probability
         """
         m = -(n * math.log(p))/(math.log(2)**2)
-        return int(m)
+        return round(m)
 
     @classmethod
     def get_hash_count(self, m: int, n):
@@ -55,7 +55,7 @@ class BloomFilter:
         @param n: number of items expected to be stored
         """
         k = (m/n) * math.log(2)
-        return int(k)
+        return round(k)
 
     def insert(self, key):
         """ Insert a key """
